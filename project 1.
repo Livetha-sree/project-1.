@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mail Sorting System</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+    button {
+      padding: 10px;
+      margin: 10px 0;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Mail Sorting System</h1>
+  
+  <label for="sortBy">Sort by: </label>
+  <select id="sortBy">
+    <option value="date">Date</option>
+    <option value="priority">Priority</option>
+  </select>
+  <button onclick="sortMails()">Sort</button>
+
+  <table id="mailTable">
+    <thead>
+      <tr>
+        <th>Sender</th>
+        <th>Subject</th>
+        <th>Date</th>
+        <th>Priority</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Mails will be displayed here -->
+    </tbody>
+  </table>
+
+  <script>
+    // Function to fetch and display the mails
+    function displayMails(mails) {
+      const tableBody = document.querySelector("#mailTable tbody");
+      tableBody.innerHTML = '';  // Clear the table
+
+      mails.forEach(mail => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${mail.sender}</td>
+          <td>${mail.subject}</td>
+          <td>${mail.date}</td>
+          <td>${mail.priority}</td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
+
+    // Function to handle sorting
+    function sortMails() {
+      const sortBy = document.querySelector("#sortBy").value;
+
+      fetch('/sort-mails', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ sortBy: sortBy })
+      })
+      .then(response => response.json())
+      .then(sortedMails => {
+        displayMails(sortedMails);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+    }
+
+    // Initial display of mails
+    document.addEventListener("DOMContentLoaded", () => {
+      sortMails(); // Automatically sort by default (date)
+    });
+  </script>
+
+</body>
+</html>
